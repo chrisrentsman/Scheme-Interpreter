@@ -109,7 +109,7 @@ char *getToken ()
   else {                            //Case (4): scan for symbol
     i = 0;
     lookahead = 1;
-    while ((c != '(') && (c != ')') && (c != '\'') && (c != ' ') && (c != '\n')) {
+    while ((c != '(') && (c != ')') && (c != ' ') && (c != '\n')) {
       lexeme[i++] = c;
       c = getchar();
      }/* while */
