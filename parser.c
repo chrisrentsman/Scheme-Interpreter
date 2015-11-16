@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include "lexer.h"
 #include "parser.h"
+#include "list.h"
 
 /****************************************************************
  Data members
@@ -17,6 +18,61 @@
         read in by the lexer.
  ****************************************************************/
 static char token[20];
+
+/****************************************************************
+ Static Function Declarations
+ ----------------------------
+ Declaring functions for use later.
+ ****************************************************************/
+static void readToken();
+static List closeExpression(List c, int depth);
+static List readSExpression(int depth);
+static void printRecursiveList(List c);
+static void printSymbol(List c);
+static void printParenList(List c);
+static int isSymbol(List c);
+
+/****************************************************************
+ S_Expression(): See parser.h for documentation.
+ ***************************************************************/
+List S_Expression() {
+    startTokens(20);
+    readToken();
+    return readSExpression(0);
+}
+
+/****************************************************************
+ Function: readSExpression(int depth)
+ ------------------------------------
+ Private recursive helper method that reads in data from the
+ user and prints out the parse tree for the user provided S
+ expression. It keeps track of the depth of the recursion to
+ provide the correct number of spaces for each level within
+ the parse tree.
+ ****************************************************************/
+static List readSExpression(int depth) {
+    List local, temp;
+
+    if (strcmp(token, "(") == 0) {
+        local = createList();
+        readToken();
+        setFirst(local, readSExpression(depth + 1));
+        temp = local;
+
+        while (strcmp(token, ")") != 0) {
+            setRest(temp, createList());
+            temp = getRest(temp);
+            setFirst(temp, readSExpression(depth + 1));
+        }
+    
+        setRest(temp, NULL);
+        return closeExpression(local, depth);
+    } else {
+        local = createList();
+        setSymbol(local, token);
+        return closeExpression(local, depth);
+    }
+}
 
 /****************************************************************
  Function: readToken()
@@ -30,76 +86,66 @@ static void readToken() {
 }
 
 /****************************************************************
- Function: printSpaces(int num)
- ------------------------------
- Private function that takes in an integer and prints out
- that many spaces without causing a new line. Helpful for
- representing the different levels and depths within the
- parse tree.
+ Function: closeExpression(List c, int depth)
+ ---------------------------------------------
+ Private function that closes and returns an expression. If
+ there is more to parse, also reads in the next token.
  ****************************************************************/
-static void printSpaces(int num) {
-    int i;
-    for (i = 0; i < num; i++) {
-        printf(" ");
-    }
+static List closeExpression(List c, int depth) {
+    if (depth != 0) readToken();
+    return c;
 }
 
-/****************************************************************
- Function: printSpaces(int depth)
- --------------------------------
- Closes the current expression, either by reading in the next
- token to analyze, or by ending the entire expression
- altogether if the current depth of the expression is 0 (the
- starting point).
- ****************************************************************/
-static void closeExpression(int depth) {
-    if (depth == 0) {
-        printf("\n");
-    } else {
-        readToken();
-    }
-}
 
 /****************************************************************
- Function: readSExpression(int depth)
+ Function: printList(List c)
  ------------------------------------
- Private recursive helper method that reads in data from the
- user and prints out the parse tree for the user provided S
- expression. It keeps track of the depth of the recursion to
- provide the correct number of spaces for each level within
- the parse tree.
+ Prints out a list.
  ****************************************************************/
-static void readSExpression(int depth) {
-    printSpaces(depth);
-    printf("S_Expression\n");
-
-    if (strcmp(token, "(") == 0) {
-        printSpaces(depth);
-        printf("(\n"); 
-
-        readToken();
-        readSExpression(depth + 2);
-        while (strcmp(token, ")") != 0) {
-            readSExpression(depth + 2);
-        }
-
-        printSpaces(depth);
-        printf(")\n");
-        closeExpression(depth);
-    } else {
-        printSpaces(depth + 2);
-        printf("%s\n", token); 
-        closeExpression(depth);
-    }
+void printList(List c) {
+    if (isSymbol(c)) printSymbol(c);
+    else printParenList(c); 
 }
-
 
 /****************************************************************
- S_Expression(): See parser.h for documentation.
- ***************************************************************/
-void S_Expression() {
-    startTokens(20);
-    readToken();
-    readSExpression(0);
+ Function: printRecursiveList(List c)
+ ------------------------------------
+ Private helper method that prints out the content of a list
+ through recursion.
+ ****************************************************************/
+static void printRecursiveList(List c) {
+    if (c == NULL) return;
+
+    printList(getFirst(c));
+    if (getRest(c) != NULL) printf(" "); 
+    printRecursiveList(getRest(c));
 }
 
+/****************************************************************
+ Function: printSymbol(List c)
+ ------------------------------------
+ Prints out a symbol.
+ ****************************************************************/
+static void printSymbol(List c) {
+    printf("%s", getSymbol(c));
+}
+
+/****************************************************************
+ Function: printParenList(List c)
+ ------------------------------------
+ Prints out a parenthesized list.
+ ****************************************************************/
+static void printParenList(List c) {
+    printf("("); 
+    printRecursiveList(c);
+    printf(")"); 
+}
+
+/****************************************************************
+ Function: isSymbol(List c)
+ ------------------------------------
+ Checks to see if a list is a symbol.
+ ****************************************************************/
+static int isSymbol(List c) {
+    return getFirst(c) == NULL && getRest(c) == NULL;
+}

@@ -9,34 +9,16 @@
 #define PARSER
 #include <stdlib.h>
 #include <stdio.h>
+#include "list.h"
 
 /****************************************************************
  Function: S_Expression()
  ------------------------------------
  Recursively reads in a S expression and outputs that expression's
  parse tree. For example, if we had the expression below:
-
-    (a (b c) d)
-
- This function would output:
-    
-    S_Expression
-    (
-      S_Expression
-        a
-      S_Expression
-      (
-        S_Expression
-          b
-        S_Expression
-          c
-      )
-      S_Expression
-        d
-    )
-
- This represents the overall structure of the expression.
  */
-void S_Expression();
+List S_Expression();
+
+void printList();
 
 #endif
