@@ -18,8 +18,8 @@
  *
  *      List c;
  */
-struct list;
-typedef struct list * List;
+struct conscell;
+typedef struct conscell * List;
 
 /**********************************************************************
  *  Function: createList()

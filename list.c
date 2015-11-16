@@ -14,10 +14,10 @@
  ---------------
  Defines the list struct, which completes the List data type.
  ***************************************************************/
-struct list {
+struct conscell {
     char * symbol; 
-    struct list * first;
-    struct list * rest;
+    struct conscell * first;
+    struct conscell * rest;
 };
 
 /****************************************************************
