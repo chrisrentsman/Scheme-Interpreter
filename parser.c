@@ -96,7 +96,6 @@ static List closeExpression(List c, int depth) {
     return c;
 }
 
-
 /****************************************************************
  Function: printList(List c)
  ------------------------------------
