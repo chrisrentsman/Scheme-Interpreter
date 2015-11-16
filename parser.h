@@ -19,11 +19,4 @@
  */
 List S_Expression();
 
-/****************************************************************
- Function: printList()
- ------------------------------------
- Given a list, prints it out.
- */
-void printList(List l);
-
 #endif

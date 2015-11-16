@@ -27,9 +27,6 @@ static char token[20];
 static void readToken();
 static List closeExpression(List c, int depth);
 static List readSExpression(int depth);
-static void printRecursiveList(List c);
-static void printSymbol(List c);
-static void printParenList(List c);
 static int isSymbol(List c);
 
 /****************************************************************
@@ -94,50 +91,6 @@ static void readToken() {
 static List closeExpression(List c, int depth) {
     if (depth != 0) readToken();
     return c;
-}
-
-/****************************************************************
- Function: printList(List c)
- ------------------------------------
- Prints out a list.
- ****************************************************************/
-void printList(List c) {
-    if (isSymbol(c)) printSymbol(c);
-    else printParenList(c); 
-}
-
-/****************************************************************
- Function: printRecursiveList(List c)
- ------------------------------------
- Private helper method that prints out the content of a list
- through recursion.
- ****************************************************************/
-static void printRecursiveList(List c) {
-    if (c == NULL) return;
-
-    printList(getFirst(c));
-    if (getRest(c) != NULL) printf(" "); 
-    printRecursiveList(getRest(c));
-}
-
-/****************************************************************
- Function: printSymbol(List c)
- ------------------------------------
- Prints out a symbol.
- ****************************************************************/
-static void printSymbol(List c) {
-    printf("%s", getSymbol(c));
-}
-
-/****************************************************************
- Function: printParenList(List c)
- ------------------------------------
- Prints out a parenthesized list.
- ****************************************************************/
-static void printParenList(List c) {
-    printf("("); 
-    printRecursiveList(c);
-    printf(")"); 
 }
 
 /****************************************************************

@@ -6,8 +6,8 @@
  can either point at two more lists, or contain a string.
  *********************************************************************/
 
-#ifndef CELL
-#define CELL
+#ifndef LIST
+#define LISt
 #include <stdio.h>
 #include <stdlib.h>
 

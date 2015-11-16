@@ -3,6 +3,7 @@
 #include <string.h>
 #include "parser.h"
 #include "list.h"
+#include "list_utils.h"
 
 int main() {
 

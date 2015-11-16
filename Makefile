@@ -4,8 +4,8 @@
 #is "schemer," which just takes a line of input and
 #breaks it up into tokens.
 
-scheme: interpreter.o parser.o lexer.o list.o
-	gcc -o scheme interpreter.o parser.o lexer.o list.o
+scheme: interpreter.o parser.o lexer.o list.o list_utils.o
+	gcc -o scheme interpreter.o parser.o lexer.o list.o list_utils.o
 
 interpreter.o: interpreter.c
 	gcc -c interpreter.c
@@ -18,6 +18,9 @@ lexer.o: lexer.c
 
 list.o: list.c
 	gcc -c list.c
+
+list_utils.o: list_utils.c
+	gcc -c list_utils.c
 
 clean:
 	rm -f *~ *.o *.a scheme
