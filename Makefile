@@ -4,11 +4,11 @@
 #is "schemer," which just takes a line of input and
 #breaks it up into tokens.
 
-scheme: parsetester.o parser.o lexer.o list.o
-	gcc -o scheme parsetester.o parser.o lexer.o list.o
+scheme: interpreter.o parser.o lexer.o list.o
+	gcc -o scheme interpreter.o parser.o lexer.o list.o
 
-parsetester.o: parsetester.c
-	gcc -c parsetester.c
+interpreter.o: interpreter.c
+	gcc -c interpreter.c
 
 parser.o: parser.c
 	gcc -c parser.c
