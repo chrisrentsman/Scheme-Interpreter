@@ -38,6 +38,16 @@ List createList() {
     return list;
 }
 
+List copyList(List from) {
+    List list = (List) malloc(sizeof(from));
+    if (list == NULL) {
+        printf("Out of memory!\n");
+        exit(1);
+    }
+    memcpy(list, from, sizeof(from));
+    return list;
+}
+
 /****************************************************************
  Function: setFirst(List source, List sink)
  -------------------------------------------

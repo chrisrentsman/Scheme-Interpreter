@@ -27,7 +27,6 @@ static char token[20];
 static void readToken();
 static List closeExpression(List c, int depth);
 static List readSExpression(int depth);
-static int isSymbol(List c);
 
 /****************************************************************
  S_Expression(): See parser.h for documentation.
@@ -91,13 +90,4 @@ static void readToken() {
 static List closeExpression(List c, int depth) {
     if (depth != 0) readToken();
     return c;
-}
-
-/****************************************************************
- Function: isSymbol(List c)
- ------------------------------------
- Checks to see if a list is a symbol.
- ****************************************************************/
-static int isSymbol(List c) {
-    return getFirst(c) == NULL && getRest(c) == NULL;
 }

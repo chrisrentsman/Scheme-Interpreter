@@ -29,6 +29,7 @@ typedef struct conscell * List;
  *      List c = createList();
  */
 List createList();
+List copyList();
 
 /**********************************************************************
  *  Functions: setFirst(List source, List sink), getFirst(List source)
