@@ -66,7 +66,8 @@ List quote(List list) {
  Returns the first element of the list.
  ****************************************************************/
 List car(List list) {
-    return getFirst(list);
+    if (getFirst(list) != NULL) return getFirst(list);
+    else return FALSE_LIST;
 }
 
 /****************************************************************
@@ -75,7 +76,8 @@ List car(List list) {
  Returns the rest of the elements of the list.
  ****************************************************************/
 List cdr(List list) {
-    return getRest(list);
+    if (getRest(list) != NULL) return getRest(list);
+    else return FALSE_LIST;
 }
 
 /****************************************************************
