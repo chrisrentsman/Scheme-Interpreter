@@ -12,6 +12,15 @@
 #include "list.h"
 
 /****************************************************************
+ Data Members
+ ------------------------------------
+ Two constant lists, with one list representing the true list,
+ and the other list representing the false list.
+ */
+List TRUE_LIST;
+List FALSE_LIST;
+
+/****************************************************************
  Function: S_Expression()
  ------------------------------------
  Recursively reads in a S expression and outputs that expression's

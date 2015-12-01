@@ -18,6 +18,7 @@
         read in by the lexer.
  ****************************************************************/
 static char token[20];
+static int initialized = 0;
 
 /****************************************************************
  Static Function Declarations
@@ -27,14 +28,29 @@ static char token[20];
 static void readToken();
 static List closeExpression(List c, int depth);
 static List readSExpression(int depth);
+static void initialize();
 
 /****************************************************************
  S_Expression(): See parser.h for documentation.
  ***************************************************************/
 List S_Expression() {
-    startTokens(20);
+    if (initialized == 0) initialize();
     readToken();
     return readSExpression(0);
+}
+
+/****************************************************************
+ initialize(): Initializes the parser and makes constant lists.
+ ***************************************************************/
+static void initialize() {
+    initialized = 1;
+    startTokens(20);
+
+    TRUE_LIST = createList();
+    setSymbol(TRUE_LIST, "#t");
+
+    FALSE_LIST = createList();
+    setSymbol(FALSE_LIST, "()");
 }
 
 /****************************************************************
@@ -63,6 +79,8 @@ static List readSExpression(int depth) {
     
         setRest(temp, NULL);
         return closeExpression(local, depth);
+    } else if (strcmp(token, "#f") == 0 || strcmp(token, "()") == 0) {
+        return closeExpression(FALSE_LIST, depth);
     } else {
         local = createList();
         setSymbol(local, token);

@@ -14,6 +14,7 @@ int main() {
     while(1) {
         printf("\nscheme> ");
         List expression = S_Expression();
-        List test = copyList(expression);
+        printList(eval(expression));
+	printf("\n");
     }
 }

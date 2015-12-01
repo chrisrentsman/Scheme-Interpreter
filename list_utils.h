@@ -26,11 +26,25 @@ List eval(List list);
 List quote(List list);
 
 /****************************************************************
+ Function: cons(List list1, List list2)
+ ---------------------------------------
+ Constructs a new list out of two lists.
+ */
+List cons(List list1, List list2);
+
+/****************************************************************
  Function: car(List list)
  ----------------------------
  Given a list, returns the first element.
  */
 List car(List list);
+
+/****************************************************************
+ Function: isSymbol(List list)
+ ---------------------------------------
+ Checks to see if a list is a symbol.
+ */
+List isSymbol(List list);
 
 /****************************************************************
  Function: cdr(List list)
