@@ -16,6 +16,7 @@
  ------------
  token: A string (character array) that houses the last token
         read in by the lexer.
+ initialized: Whether or not the parser has been initialized.
  ****************************************************************/
 static char token[20];
 static int initialized = 0;
@@ -81,6 +82,8 @@ static List readSExpression(int depth) {
         return closeExpression(local, depth);
     } else if (strcmp(token, "#f") == 0 || strcmp(token, "()") == 0) {
         return closeExpression(FALSE_LIST, depth);
+    } else if (strcmp(token, "#t") == 0 || strcmp(token, "else") == 0) {
+        return closeExpression(TRUE_LIST, depth);
     } else {
         local = createList();
         setSymbol(local, token);

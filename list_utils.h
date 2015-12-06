@@ -32,6 +32,14 @@ List quote(List list);
  */
 List cons(List list1, List list2);
 
+
+/****************************************************************
+ Function: cond(List list)
+ ---------------------------------------
+ Evaluates a conditional.
+ */
+List cond(List list);
+
 /****************************************************************
  Function: append(List list1, List list2)
  ---------------------------------------
@@ -46,7 +54,26 @@ List append(List list1, List list2);
  */
 List isNull(List list);
 
+/****************************************************************
+ Function: define(List list)
+ ---------------------------------------
+ Defines a new variable in the global environment.
+ */
+List define(List list);
+
+/****************************************************************
+ Function: isEqual(List list1, List list2)
+ ---------------------------------------
+ Checks to see if tw lists are equal.
+ */
 List isEqual(List list1, List list2);
+
+/****************************************************************
+ Function: assoc(List key, List list)
+ ---------------------------------------
+ Returns the associated pair given a key.
+ */
+List assoc(List key, List list);
 
 /****************************************************************
  Function: car(List list)
