@@ -33,6 +33,22 @@ List quote(List list);
 List cons(List list1, List list2);
 
 /****************************************************************
+ Function: append(List list1, List list2)
+ ---------------------------------------
+ Appends one list to another
+ */
+List append(List list1, List list2);
+
+/****************************************************************
+ Function: isNull(list)
+ ---------------------------------------
+ Checks to see if a list is equal to the null list.
+ */
+List isNull(List list);
+
+List isEqual(List list1, List list2);
+
+/****************************************************************
  Function: car(List list)
  ----------------------------
  Given a list, returns the first element.

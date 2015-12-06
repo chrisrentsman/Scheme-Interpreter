@@ -20,6 +20,8 @@ static void printRecursiveList(List list);
 static void printSymbol(List list);
 static void printParenList(List list);
 static List consHelper(List list);
+static List appendHelper(List list);
+static List isEqualHelper(List list);
 static void exitInterpreter();
 static int internalIsSymbol(List list);
 
@@ -35,12 +37,16 @@ List eval(List list) {
     char * command = getSymbol(car(list));
     if (strcmp(command, "exit") == 0) exitInterpreter();
     else if (strcmp(command, "cons") == 0) return consHelper(list);
+    else if (strcmp(command, "append") == 0) return appendHelper(list);
+    else if (strcmp(command, "equal?") == 0) return isEqualHelper(list);
     else if (strcmp(command, "quote") != 0) local = eval(quote(list));
 
     if (strcmp(command, "quote") == 0) return quote(local);
     else if (strcmp(command, "car") == 0) return car(local);
     else if (strcmp(command, "cdr") == 0) return cdr(local);
+    else if (strcmp(command, "null?") == 0) return isNull(local);
     else if (strcmp(command, "symbol?") == 0) return isSymbol(local);
+    else return list;
 }
 
 /****************************************************************
@@ -80,6 +86,21 @@ List cdr(List list) {
     else return FALSE_LIST;
 }
 
+static List isEqualHelper(List list) {
+    List list1 = eval(quote(list));
+    List list2 = eval(quote(cdr(list)));
+    return isEqual(list1, list2);
+}
+
+List isEqual(List list1, List list2) {
+    if (isSymbol(list1) != isSymbol(list2)) return FALSE_LIST;
+    else if (isSymbol(list1) == TRUE_LIST && isSymbol(list2) == TRUE_LIST) 
+        return strcmp(getSymbol(list1), getSymbol(list2)) == 0 ? TRUE_LIST : FALSE_LIST;   
+
+    if (isEqual(car(list1), car(list2)) == isEqual(cdr(list1), cdr(list2))) return TRUE_LIST;
+    else return FALSE_LIST;
+}
+
 /****************************************************************
  Function: consHelper(List list)
  ---------------------------------------
@@ -105,6 +126,25 @@ List cons(List list1, List list2) {
     setFirst(newList, list1);
     setRest(newList, list2);
     return newList;
+}
+
+static List appendHelper(List list) {
+    List list1 = eval(quote(list));
+    List list2 = eval(quote(cdr(list)));
+
+    if (list1 == FALSE_LIST && list2 == FALSE_LIST) return FALSE_LIST;
+    else if (list2 == FALSE_LIST) return append(list2, list1);
+    else return append(list1, list2);
+}
+
+List append(List list1, List list2) {
+    if (list1 == FALSE_LIST) return list2;
+    return cons(car(list1), append((cdr(list1)), list2));
+}
+
+List isNull(List list) {
+    if (list == FALSE_LIST) return TRUE_LIST;
+    else return FALSE_LIST;
 }
 
 /****************************************************************
