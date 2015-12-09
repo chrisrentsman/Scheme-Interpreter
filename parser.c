@@ -83,7 +83,18 @@ static List readSExpression(int depth) {
     } else if (strcmp(token, "#f") == 0 || strcmp(token, "()") == 0) {
         return closeExpression(FALSE_LIST, depth);
     } else if (strcmp(token, "#t") == 0 || strcmp(token, "else") == 0) {
-        return closeExpression(TRUE_LIST, depth);
+        return closeExpression(TRUE_LIST, depth); 
+    } else if (strcmp(token, "'") == 0) {
+        local = createList();
+        setFirst(local, createList());
+        setSymbol(getFirst(local), "quote");
+        setRest(local, createList());
+
+        readToken();
+        setFirst(getRest(local), readSExpression(depth));
+        setRest(getRest(local), NULL);
+
+        return local;
     } else {
         local = createList();
         setSymbol(local, token);
