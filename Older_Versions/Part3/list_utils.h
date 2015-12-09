@@ -32,12 +32,13 @@ List quote(List list);
  */
 List cons(List list1, List list2);
 
+
 /****************************************************************
  Function: cond(List list)
  ---------------------------------------
  Evaluates a conditional.
  */
-List cond(List conditional, List env);
+List cond(List list);
 
 /****************************************************************
  Function: append(List list1, List list2)
@@ -58,7 +59,7 @@ List isNull(List list);
  ---------------------------------------
  Defines a new variable in the global environment.
  */
-List define(List list, List env);
+List define(List list);
 
 /****************************************************************
  Function: isEqual(List list1, List list2)
@@ -87,13 +88,6 @@ List car(List list);
  Checks to see if a list is a symbol.
  */
 List isSymbol(List list);
-
-/****************************************************************
- Function: isList(List list)
- ---------------------------------------
- Checks to see if a list is a list.
- */
-List isList(List list);
 
 /****************************************************************
  Function: cdr(List list)

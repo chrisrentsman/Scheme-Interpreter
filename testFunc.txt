@@ -1,0 +1,7 @@
+(define (test)
+	(cond (#f (quote (a b c)))
+	      (#t (quote (e f g)))))
+
+(test)
+
+(exit)

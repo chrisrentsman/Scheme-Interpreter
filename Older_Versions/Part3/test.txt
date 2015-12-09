@@ -26,8 +26,4 @@ l2
       (else (cdr (quote (a b)))))
 (cond ((null? (quote (a))) (car (quote (a b))))
       (else (cdr (quote (a b)))))
-(symbol? (quote a))
-(symbol? (quote (a b c)))
-(list? (quote a))
-(list? (quote (a b c)))
 (exit)

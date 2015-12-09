@@ -23,16 +23,12 @@ static void printSymbol(List list);
 static void printParenList(List list);
 
 // Helps with multivariable functions
-static List consHelper(List list, List environment);
-static List appendHelper(List list, List environment);
-static List isEqualHelper(List list, List environment);
-static List assocHelper(List list, List environment);
-static List defineSymbol(List key, List definition);
-static List evalHelper(List list, List environment);
+static List consHelper(List list);
+static List appendHelper(List list);
+static List isEqualHelper(List list);
+static List assocHelper(List list);
 
 // Various control functions
-static List userDefinedFunction(List list, List environment);
-static List augmentEnvironment(List userParams, List params, List environment);
 static void exitInterpreter();
 static int internalIsSymbol(List list);
 static int initialized = 0;
@@ -51,85 +47,41 @@ static void initialize() {
     initialized = 1;
 }
 
-List eval(List list) {
-    if (!initialized) initialize();
-    return evalHelper(list, environment);
-}
-
 /****************************************************************
  Function: eval(List list)
  ------------------------------------
  Evaluates a new list.
  ****************************************************************/
-List evalHelper(List list, List localEnv) {
+List eval(List list) {
+    if (!initialized) initialize();
     List local = list;
 
     // symbol lookup
     if (list == TRUE_LIST) return TRUE_LIST;
     else if (list == FALSE_LIST) return FALSE_LIST;
-    else if (internalIsSymbol(list)) return car(cdr(assoc(list, localEnv)));
+    else if (internalIsSymbol(list)) return car(cdr(assoc(list, environment)));
 
     // get command of function
     char * command = getSymbol(car(list));
 
     // special exit function, two param functions, and recursion
     if (strcmp(command, "exit") == 0) exitInterpreter();
-    else if (strcmp(command, "cons") == 0) return consHelper(list, localEnv);
-    else if (strcmp(command, "append") == 0) return appendHelper(list, localEnv);
-    else if (strcmp(command, "equal?") == 0) return isEqualHelper(list, localEnv);
-    else if (strcmp(command, "assoc") == 0) return assocHelper(list, localEnv);
-    else if (strcmp(command, "define") == 0) return define(list, localEnv);
-    else if (strcmp(command, "cond") == 0) return cond(cdr(list), localEnv);
-    else if (strcmp(command, "environment") == 0) return environment;
-    else if (strcmp(command, "quote") != 0) local = evalHelper(quote(list), localEnv);
+    else if (strcmp(command, "cons") == 0) return consHelper(list);
+    else if (strcmp(command, "append") == 0) return appendHelper(list);
+    else if (strcmp(command, "equal?") == 0) return isEqualHelper(list);
+    else if (strcmp(command, "assoc") == 0) return assocHelper(list);
+    else if (strcmp(command, "define") == 0) return define(list);
+    else if (strcmp(command, "cond") == 0) return cond(cdr(list));
+    else if (strcmp(command, "quote") != 0) local = eval(quote(list));
 
     // single param functions and function look up
     if (strcmp(command, "quote") == 0) return quote(local);
     else if (strcmp(command, "car") == 0) return car(local);
     else if (strcmp(command, "cdr") == 0) return cdr(local);
     else if (strcmp(command, "null?") == 0) return isNull(local);
-    else if (strcmp(command, "list?") == 0) return isList(local);
     else if (strcmp(command, "symbol?") == 0) return isSymbol(local);
-    else return userDefinedFunction(list, localEnv);
-}
-
-static List userDefinedFunction(List list, List environment) {
-    List pair = assoc(car(list), environment);
-    List params = cdr(car(cdr(car(cdr(pair)))));
-    List definition = car(cdr(cdr(car(cdr(pair)))));
-    List userParams = cdr(list);
-    List augmented = augmentEnvironment(userParams, params, environment);
-    return evalHelper(definition, augmented);
-}
-
-static List augmentEnvironment(List userParams, List params, List environment) {
-    List newPairs = FALSE_LIST;
-    List augmented = FALSE_LIST;
-
-    while (userParams != FALSE_LIST) {
-        List key = car(params);
-        List value = evalHelper(car(userParams), environment);
-        List pair = createList();
-
-        setFirst(pair, key);
-        setRest(pair, createList());
-        setFirst(getRest(pair), value);
-        setRest(getRest(pair), NULL);
-
-        if (newPairs == FALSE_LIST) newPairs = cons(pair, NULL);
-        else newPairs = cons(pair, newPairs);
-
-        params = cdr(params);
-        userParams = cdr(userParams);
-    }
-
-    while (newPairs != FALSE_LIST) {
-        if (augmented == FALSE_LIST) augmented = cons(car(newPairs), environment);
-        else augmented = cons(car(newPairs), augmented);
-        newPairs = cdr(newPairs);
-    }
-
-    return augmented;
+    else return car(cdr(assoc(car(list), environment)));
+    
 }
 
 /****************************************************************
@@ -174,11 +126,21 @@ List cdr(List list) {
  ---------------------------------------
  Helps out the assoc function.
  ****************************************************************/
-static List assocHelper(List list, List environment) {
-    List key = evalHelper(quote(list), environment);
-    List reference = evalHelper(quote(cdr(list)), environment);
+static List assocHelper(List list) {
+    List key = eval(quote(list));
+    List reference = eval(quote(cdr(list)));
     return assoc(key, reference);
 }
+
+List cond(List conditional) {
+    if (conditional == FALSE_LIST) return FALSE_LIST;
+    List first = car(conditional);
+    List firstCond = car(first);
+
+    if (eval(firstCond) == TRUE_LIST) return eval(car(cdr(first)));
+    else return cond(cdr(conditional));
+}
+
 /****************************************************************
  Function: assoc(List key, List list)
  ---------------------------------------
@@ -196,15 +158,11 @@ List assoc(List key, List list) {
  ---------------------------------------
  Defines a new variable on the global environment. 
  ****************************************************************/
-List define(List list, List environment) {
+List define(List list) {
     List key = car(cdr(list));
-    List definition = evalHelper(car(cdr(cdr(list))), environment);
+    List definition = eval(car(cdr(cdr(list))));
 
-    if (isSymbol(key) == TRUE_LIST) return defineSymbol(key, definition);
-    else if (isList(key) == TRUE_LIST) return defineSymbol(car(key), list);
-}
-
-static List defineSymbol(List key, List definition) {
+    // constructs the entry
     List entry = createList();
     setFirst(entry, key);
     setRest(entry, createList());
@@ -213,29 +171,20 @@ static List defineSymbol(List key, List definition) {
     setFirst(rest, definition);
     setRest(rest, NULL);
 
+    // adds entry to global environment
     if (environment == FALSE_LIST) environment = cons(entry, NULL);
     else environment = cons(entry, environment);
     return key;
 }
-
-List cond(List conditional, List env) {
-    if (conditional == FALSE_LIST) return FALSE_LIST;
-    List first = car(conditional);
-    List firstCond = car(first);
-
-    if (evalHelper(firstCond, env) == TRUE_LIST) return evalHelper(car(cdr(first)), env);
-    else return cond(cdr(conditional), env);
-}
-
 
 /****************************************************************
  Function: isEqualHelper(List list)
  ---------------------------------------
  Helps out with the isEqual function.
  ****************************************************************/
-static List isEqualHelper(List list, List env) {
-    List list1 = evalHelper(quote(list), env);
-    List list2 = evalHelper(quote(cdr(list)), env);
+static List isEqualHelper(List list) {
+    List list1 = eval(quote(list));
+    List list2 = eval(quote(cdr(list)));
     return isEqual(list1, list2);
 }
 
@@ -268,9 +217,9 @@ List isEqual(List list1, List list2) {
  ---------------------------------------
  Constructs a new list out of two lists. Parses a cons command.
  ****************************************************************/
-static List consHelper(List list, List env) {
-    List list1 = evalHelper(quote(list), env);
-    List list2 = evalHelper(quote(cdr(list)), env);
+static List consHelper(List list) {
+    List list1 = eval(quote(list));
+    List list2 = eval(quote(cdr(list)));
 
     if (list1 == FALSE_LIST && list2 == FALSE_LIST) return FALSE_LIST;
     else if (list1 == FALSE_LIST) return cons(list2, NULL);
@@ -295,9 +244,9 @@ List cons(List list1, List list2) {
  ---------------------------------------
  Helps out with the append function.
  ****************************************************************/
-static List appendHelper(List list, List env) {
-    List list1 = evalHelper(quote(list), env);
-    List list2 = evalHelper(quote(cdr(list)), env);
+static List appendHelper(List list) {
+    List list1 = eval(quote(list));
+    List list2 = eval(quote(cdr(list)));
 
     if (list1 == FALSE_LIST && list2 == FALSE_LIST) return FALSE_LIST;
     else if (list2 == FALSE_LIST) return append(list2, list1);
@@ -341,16 +290,6 @@ int internalIsSymbol(List list) {
 List isSymbol(List list) {
     if (internalIsSymbol(list)) return TRUE_LIST;
     else return FALSE_LIST;
-}
-
-/****************************************************************
- Function: isList(List list)
- ---------------------------------------
- Checks to see if a list is a List.
- ****************************************************************/
-List isList(List list) {
-    if (isSymbol(list) == TRUE_LIST) return FALSE_LIST;
-    else return TRUE_LIST;
 }
 
 /****************************************************************
