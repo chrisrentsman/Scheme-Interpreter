@@ -85,7 +85,7 @@ static List evalHelper(List list, List localEnv) {
     // get command of function
     char * command = getSymbol(car(list));
 
-    // TODO: group two param functions together with helpers
+    // TODO?: group two param functions together with helpers
 
     // special exit function, two param functions, and recursion
     if (strcmp(command, "exit") == 0) exitInterpreter();
@@ -102,6 +102,10 @@ static List evalHelper(List list, List localEnv) {
     if (strcmp(command, "quote") == 0) return quote(local);
     else if (strcmp(command, "car") == 0) return car(local);
     else if (strcmp(command, "cdr") == 0) return cdr(local);
+    else if (strcmp(command, "cadr") == 0) return cadr(local);
+    else if (strcmp(command, "caddr") == 0) return caddr(local);
+    else if (strcmp(command, "cadddr") == 0) return cadddr(local);
+    else if (strcmp(command, "caddddr") == 0) return caddddr(local);
     else if (strcmp(command, "null?") == 0) return isNull(local);
     else if (strcmp(command, "list?") == 0) return isList(local);
     else if (strcmp(command, "symbol?") == 0) return isSymbol(local);
@@ -239,6 +243,42 @@ List cdr(List list) {
     else return FALSE_LIST;
 }
 
+/**
+ * Function: cadr(List list)
+ * ---------------------------------------
+ * Returns the second element of the list.
+ */
+List cadr(List list) {
+    return car(cdr(list));
+}
+
+/**
+ * Function: caddr(List list)
+ * ---------------------------------------
+ * Returns the third element of the list.
+ */
+List caddr(List list) {
+    return car(cdr(cdr(list)));
+}
+
+/**
+ * Function: cadddr(List list)
+ * ---------------------------------------
+ * Returns the fourth element of the list.
+ */
+List cadddr(List list) {
+    return car(cdr(cdr(cdr(list))));
+}
+
+/**
+ * Function: caddddr(List list)
+ * ---------------------------------------
+ * Returns the fifth element of the list.
+ */
+List caddddr(List list) {
+    return car(cdr(cdr(cdr(cdr(list)))));
+}
+
 /****************************************************************
  Construction Functions
  ----------------------------
@@ -317,7 +357,6 @@ List cond(List conditional, List env) {
     if (evalHelper(firstCond, env) == TRUE_LIST) return evalHelper(car(cdr(first)), env);
     else return cond(cdr(conditional), env);
 }
-
 
 /**
  * Function: isEqualHelper(List list)

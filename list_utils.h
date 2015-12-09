@@ -81,6 +81,34 @@ List assoc(List key, List list);
  */
 List car(List list);
 
+/***************************************************************
+ * Function: cadr(List list)
+ * ---------------------------------------
+ * Returns the second element of the list.
+ */
+List cadr(List list);
+
+/***************************************************************
+ * Function: caddr(List list)
+ * ---------------------------------------
+ * Returns the third element of the list.
+ */
+List caddr(List list);
+
+/***************************************************************
+ * Function: cadddr(List list)
+ * ---------------------------------------
+ * Returns the fourth element of the list.
+ */
+List cadddr(List list);
+
+/***************************************************************
+ * Function: caddddr(List list)
+ * ---------------------------------------
+ * Returns the fifth element of the list.
+ */
+List caddddr(List list);
+
 /****************************************************************
  Function: isSymbol(List list)
  ---------------------------------------
