@@ -36,8 +36,6 @@ static List augmentEnvironment(List userParams, List params, List environment);
 static List createKeyValuePair(List key, List value);
 static void exitInterpreter();
 static int internalIsSymbol(List list);
-static List convertIntToList(int n);
-static int convertToInt(List list);
 static int initialized = 0;
 static void initialize();
 
@@ -82,44 +80,30 @@ static List evalHelper(List list, List localEnv) {
     // symbol lookup
     if (list == TRUE_LIST) return TRUE_LIST;
     else if (list == FALSE_LIST) return FALSE_LIST;
-    else if (isNumber(list, localEnv) == TRUE_LIST) return list;
     else if (internalIsSymbol(list)) return car(cdr(assoc(list, localEnv)));
 
     // get command of function
     char * command = getSymbol(car(list));
 
+    // TODO: group two param functions together with helpers
+
     // special exit function, two param functions, and recursion
     if (strcmp(command, "exit") == 0) exitInterpreter();
     else if (strcmp(command, "cons") == 0) return consHelper(list, localEnv);
     else if (strcmp(command, "append") == 0) return appendHelper(list, localEnv);
-    else if (strcmp(command, "equal?") == 0 || strcmp(command, "=") == 0) return isEqualHelper(list, localEnv);
+    else if (strcmp(command, "equal?") == 0) return isEqualHelper(list, localEnv);
     else if (strcmp(command, "assoc") == 0) return assocHelper(list, localEnv);
     else if (strcmp(command, "define") == 0) return define(list, localEnv);
     else if (strcmp(command, "cond") == 0) return cond(cdr(list), localEnv);
     else if (strcmp(command, "environment") == 0) return environment;
-    else if (strcmp(command, "length") == 0) return length(cdr(list), localEnv);
-    else if (strcmp(command, "list") == 0) return paramList(cdr(list), localEnv);
-    else if (strcmp(command, "+") == 0) return addList(cdr(list), localEnv);
-    else if (strcmp(command, "*") == 0) return multiplyList(cdr(list), localEnv);
-    else if (strcmp(command, "-") == 0) return subtractList(cdr(list), localEnv);
-    else if (strcmp(command, "<") == 0) return lessThan(cdr(list), localEnv);
-    else if (strcmp(command, ">") == 0) return greaterThan(cdr(list), localEnv);
-    else if (strcmp(command, "AND") == 0) return and(cdr(list), localEnv);
-    else if (strcmp(command, "OR") == 0) return or(cdr(list), localEnv);
     else if (strcmp(command, "quote") != 0) local = evalHelper(quote(list), localEnv);
 
     // single param functions and function look up
     if (strcmp(command, "quote") == 0) return quote(local);
     else if (strcmp(command, "car") == 0) return car(local);
     else if (strcmp(command, "cdr") == 0) return cdr(local);
-    else if (strcmp(command, "cadr") == 0) return cadr(local);
-    else if (strcmp(command, "caddr") == 0) return caddr(local);
-    else if (strcmp(command, "cadddr") == 0) return cadddr(local);
-    else if (strcmp(command, "caddddr") == 0) return caddddr(local);
-    else if (strcmp(command, "last") == 0) return last(local);
-    else if (strcmp(command, "null?") == 0 || strcmp(command, "NOT") == 0) return isNull(local);
+    else if (strcmp(command, "null?") == 0) return isNull(local);
     else if (strcmp(command, "list?") == 0) return isList(local);
-    else if (strcmp(command, "number?") == 0) return isNumber(evalHelper(car(cdr(list)), localEnv), localEnv);
     else if (strcmp(command, "symbol?") == 0) return isSymbol(local);
     else return userDefinedFunction(list, localEnv);
 }
@@ -255,122 +239,6 @@ List cdr(List list) {
     else return FALSE_LIST;
 }
 
-/**
- * Function: cadr(List list)
- * ---------------------------------------
- * Returns the second element of the list.
- */
-List cadr(List list) {
-    return car(cdr(list));
-}
-
-/**
- * Function: caddr(List list)
- * ---------------------------------------
- * Returns the third element of the list.
- */
-List caddr(List list) {
-    return car(cdr(cdr(list)));
-}
-
-/**
- * Function: cadddr(List list)
- * ---------------------------------------
- * Returns the fourth element of the list.
- */
-List cadddr(List list) {
-    return car(cdr(cdr(cdr(list))));
-}
-
-/**
- * Function: caddddr(List list)
- * ---------------------------------------
- * Returns the fifth element of the list.
- */
-List caddddr(List list) {
-    return car(cdr(cdr(cdr(cdr(list)))));
-}
-
-/**
- * Function: last(List list)
- * ---------------------------------------
- * Returns the last element of the list.
- */
-List last(List list) {
-    if (cdr(list) == FALSE_LIST) return car(list);
-    else return last(cdr(list));
-}
-
-/**
- * Function: length(List list, List env)
- * ---------------------------------------
- * Returns the length of a list (number of elements).
- */
-List length(List list, List env) {
-    list = evalHelper(car(list), env);
-    int length = 0;
-    while (list != FALSE_LIST) {
-        length++;
-        list = cdr(list);
-    }
-
-    return convertIntToList(length);
-}
-
-/****************************************************************
- Math Functions
- ----------------------------
- Functions used to do math.
- ****************************************************************/
-
-/**
- * Function: addList(List list)
- * ---------------------------------------
- * Adds a list of numbers together.
- */
-List addList(List list, List env) {
-    int sum = 0;  
-    while (list != FALSE_LIST) {
-        sum += convertToInt(evalHelper(car(list), env));
-        list = cdr(list);
-    }
-
-    return convertIntToList(sum);
-}
-
-/**
- * Function: multiplyList(List list)
- * ---------------------------------------
- * Adds a list of numbers together.
- */
-List multiplyList(List list, List env) {
-    int product = 1;  
-    while (list != FALSE_LIST) {
-        product = product * convertToInt(evalHelper(car(list), env));
-        list = cdr(list);
-    }
-
-    return convertIntToList(product);
-}
-
-/**
- * Function: subtractList(List list)
- * ---------------------------------------
- * Subtracts the cdr of the list from the car.
- */
-List subtractList(List list, List env) {
-    int start = convertToInt(evalHelper(car(list), env));
-    int difference = start;
-    list = cdr(list);
-
-    while (list != FALSE_LIST) {
-        difference -= convertToInt(evalHelper(car(list), env));
-        list = cdr(list);
-    }
-
-    return convertIntToList(difference);
-}
-
 /****************************************************************
  Construction Functions
  ----------------------------
@@ -428,30 +296,6 @@ List append(List list1, List list2) {
     return cons(car(list1), append((cdr(list1)), list2));
 }
 
-/**
- * Function: paramList(List list)
- * ---------------------------------------
- * Constructs a list out of all the parameters.
- */
-List paramList(List list, List env) {
-    List newList = createList(); 
-    List temp = newList;
-
-    while (list != FALSE_LIST) {
-        List newAtom = evalHelper(car(list), env);
-        setFirst(temp, newAtom);
-
-        if (cdr(list) != FALSE_LIST) {
-            setRest(temp, createList());
-            temp = getRest(temp);
-        }
-
-        list = cdr(list);
-    }
-
-    return newList;
-}
-
 /****************************************************************
  Boolean Functions
  ----------------------------
@@ -474,6 +318,7 @@ List cond(List conditional, List env) {
     else return cond(cdr(conditional), env);
 }
 
+
 /**
  * Function: isEqualHelper(List list)
  * ---------------------------------------
@@ -491,6 +336,8 @@ static List isEqualHelper(List list, List env) {
  * Checks to see if two lists are equal.
  */
 List isEqual(List list1, List list2) {
+
+    // TODO: Refactor, hard to understand
 
     if (isSymbol(list1) != isSymbol(list2)) {
         return FALSE_LIST;
@@ -517,7 +364,7 @@ List isNull(List list) {
     else return FALSE_LIST;
 }
 
-/**v)
+/**
  * Function: isSymbol(List list)
  * ---------------------------------------
  * Checks to see if a list is a symbol.
@@ -535,85 +382,6 @@ List isSymbol(List list) {
 List isList(List list) {
     if (isSymbol(list) == TRUE_LIST) return FALSE_LIST;
     else return TRUE_LIST;
-}
-
-/**
- * Function: isNumber(List list)
- * ---------------------------------------
- * Checks to see if a list is a Number.
- */
-List isNumber(List list, List env) {
-    if (isList(list) == TRUE_LIST) return FALSE_LIST;
-
-    char * leftover;
-    char * symbol = getSymbol(list);
-    int num = strtol(symbol, &leftover, 10);
-    int len = strlen(leftover);
-
-    if (len == 0) return TRUE_LIST;
-    else return FALSE_LIST;
-}
-
-/**
- * Function: lessThan(List list)
- * ---------------------------------------
- * Checks to see if a list is strictly increasing.
- */
-List lessThan(List list, List env) {
-    while (cdr(list) != FALSE_LIST) {
-        int val1 = convertToInt(evalHelper(car(list), env));
-        int val2 = convertToInt(evalHelper(cadr(list), env));
-        
-        if (val1 >= val2) return FALSE_LIST;
-        else list = cdr(list);
-    }
-
-    return TRUE_LIST;
-}
-
-/**
- * Function: greaterThan(List list)
- * ---------------------------------------
- * Checks to see if a list is strictly decreasing.
- */
-List greaterThan(List list, List env) {
-    while (cdr(list) != FALSE_LIST) {
-        int val1 = convertToInt(evalHelper(car(list), env));
-        int val2 = convertToInt(evalHelper(cadr(list), env));
-        
-        if (val1 <= val2) return FALSE_LIST;
-        else list = cdr(list);
-    }
-
-    return TRUE_LIST;
-}
-
-/**
- * Function: and(List list)
- * ---------------------------------------
- *  Checks to see if all elements of a list are true.
- */
-List and(List list, List env) {
-    while (list != FALSE_LIST) {
-        if (evalHelper(car(list), env) == FALSE_LIST) return FALSE_LIST;
-        else list = cdr(list);
-    }
-
-    return TRUE_LIST;
-}
-
-/**
- * Function: or(List list)
- * ---------------------------------------
- * Checks to see if at least one element is true.
- */
-List or(List list, List env) {
-    while (list != FALSE_LIST) {
-        if (evalHelper(car(list), env) == TRUE_LIST) return TRUE_LIST;
-        else list = cdr(list);
-    }
-
-    return FALSE_LIST;
 }
 
 /****************************************************************
@@ -653,7 +421,7 @@ static void printRecursiveList(List list) {
  */
 static void printSymbol(List list) {
     printf("%s", getSymbol(list));
-    }
+}
 
 /**
  * Function: printParenList(List list)
@@ -688,31 +456,6 @@ static List createKeyValuePair(List key, List value) {
     setFirst(getRest(pair), value);
     setRest(getRest(pair), NULL);
     return pair;
-}
-
-/**
- * Function: convertToInt(List list)
- * ---------------------------------------
- * Converts a list to an integer.
- */
-static int convertToInt(List list) {
-    char * leftover;
-    char * symbol = getSymbol(list);
-    int num = strtol(symbol, &leftover, 10);
-    return num;
-}
-
-/**
- * Function: convertIntToList(List list)
- * ---------------------------------------
- * Converts an integer to a list.
- */
-static List convertIntToList(int n) {
-    char string[256];
-    sprintf(string, "%i", n);
-    List number = createList();
-    setSymbol(number, string);
-    return number;
 }
 
 /**
